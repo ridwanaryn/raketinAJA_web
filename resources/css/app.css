@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    /* Fonts */
+    --font-headline: "Lexend", sans-serif;
+    --font-body: "Plus Jakarta Sans", sans-serif;
+    --font-label: "Plus Jakarta Sans", sans-serif;
+
+    /* Theme Colors mapping from Google Stitch */
+    --color-secondary: #006b15;
+    --color-tertiary-fixed-dim: #ff7e49;
+    --color-primary-container: #799dff;
+    --color-secondary-container: #00fc40;
+    --color-inverse-surface: #001205;
+    --color-on-tertiary: #ffefeb;
+    --color-on-surface: #0d361c;
+    --color-on-secondary: #d1ffc6;
+    --color-error-dim: #b92902;
+    --color-on-error-container: #520c00;
+    --color-outline-variant: #8cb794;
+    --color-surface-container-lowest: #ffffff;
+    --color-on-secondary-fixed: #00440a;
+    --color-secondary-fixed-dim: #00ec3b;
+    --color-background: #deffe1;
+    --color-primary: #0052d0;
+    --color-primary-dim: #0047b7;
+    --color-tertiary-dim: #8f3000;
+    --color-tertiary-container: #ff956b;
+    --color-on-secondary-container: #005a10;
+    --color-on-tertiary-fixed: #310b00;
+    --color-surface-container-high: #b6f0c1;
+    --color-secondary-dim: #005d11;
+    --color-surface-container-highest: #adebba;
+    --color-on-primary-fixed: #000000;
+    --color-error-container: #f95630;
+    --color-outline: #578060;
+    --color-on-tertiary-fixed-variant: #692100;
+    --color-on-secondary-fixed-variant: #006513;
+    --color-tertiary-fixed: #ff956b;
+    --color-on-primary-fixed-variant: #00276c;
+    --color-on-error: #ffefec;
+    --color-on-background: #0d361c;
+    --color-surface-bright: #deffe1;
+    --color-on-primary: #f1f2ff;
+    --color-surface-container-low: #cbfdd3;
+    --color-surface-dim: #a1e4b0;
+    --color-secondary-fixed: #00fc40;
+    --color-surface-variant: #adebba;
+    --color-on-primary-container: #001e58;
+    --color-primary-fixed: #799dff;
+    --color-surface: #deffe1;
+    --color-error: #b02500;
+    --color-inverse-primary: #5e8bff;
+    --color-surface-container: #bff5c8;
+    --color-inverse-on-surface: #7ca784;
+    --color-surface-tint: #0052d0;
+    --color-on-tertiary-container: #5b1b00;
+    --color-on-surface-variant: #3c6446;
+    --color-primary-fixed-dim: #638eff;
+    --color-tertiary: #a33800;
+    --color-neon-green: #00FF41;
+
+    /* Custom Border Radius scale */
+    --radius-lg: 2rem;
+    --radius-xl: 3rem;
+    --radius-full: 9999px;
+}
+
+/* Base custom classes from screens */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.headline-font {
+    font-family: 'Lexend', sans-serif;
+}
+.font-headline {
+    font-family: 'Lexend', sans-serif;
+}
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.kinetic-skew {
+    transform: skewX(-2deg);
+}
+.kinetic-tilt {
+    transform: rotate(-1deg);
+    transition: transform 0.3s ease;
+}
+.kinetic-tilt:hover {
+    transform: rotate(0deg);
+}
+.glass-panel {
+    background: rgba(222, 255, 225, 0.7);
+    backdrop-filter: blur(24px);
+}
+.glass-nav {
+    background: rgba(222, 255, 225, 0.7);
+    backdrop-filter: blur(24px);
+}
+/* Disable horizontal/vertical scrolls when appropriate */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
