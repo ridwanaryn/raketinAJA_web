@@ -7,28 +7,28 @@
     <!-- Hero Search & Filters -->
     <section class="mb-12">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div class="max-w-2xl">
+            <div class="max-w-2xl w-full">
                 <h1 class="headline-font text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface leading-tight">
                     UNLEASH THE <span class="text-primary italic">KINETIC</span> PULSE.
                 </h1>
                 <p class="mt-4 text-on-surface-variant font-medium text-lg md:text-xl max-w-lg">
                     Premium courts. Elite performance. Book your next match in seconds.
                 </p>
-            </div>
-            
-            <!-- Search Input & Visual Context -->
-            <form action="{{ route('fields.index') }}" method="GET" class="flex flex-wrap gap-3 w-full md:w-auto">
-                @if($sport)
-                    <input type="hidden" name="sport" value="{{ $sport }}"/>
-                @endif
-                <div class="bg-surface-container rounded-xl px-4 py-2 flex items-center gap-3 w-full sm:w-auto">
-                    <span class="material-symbols-outlined text-primary">search</span>
-                    <input type="text" name="q" value="{{ $query }}" class="bg-transparent border-none focus:ring-0 text-sm font-medium placeholder:text-on-surface-variant/50 w-full sm:w-48 text-on-surface" placeholder="Search court name..."/>
-                    @if($query || $sport)
-                        <a href="{{ route('fields.index') }}" class="text-xs text-red-600 hover:underline font-bold">Clear</a>
+                
+                <!-- Search Input & Visual Context -->
+                <form action="{{ route('fields.index') }}" method="GET" class="mt-6 w-full max-w-lg">
+                    @if($sport)
+                        <input type="hidden" name="sport" value="{{ $sport }}"/>
                     @endif
-                </div>
-            </form>
+                    <div class="bg-white border border-[#E2E8F0] rounded-xl px-4 py-3 flex items-center gap-3 w-full shadow-sm">
+                        <span class="material-symbols-outlined text-[#004EEB]">search</span>
+                        <input type="text" name="q" value="{{ $query }}" class="bg-transparent border-none focus:ring-0 text-sm font-medium placeholder-[#64748B] w-full text-on-surface" placeholder="Search court name..."/>
+                        @if($query || $sport)
+                            <a href="{{ route('fields.index') }}" class="text-xs text-red-600 hover:underline font-bold shrink-0">Clear</a>
+                        @endif
+                    </div>
+                </form>
+            </div>
         </div>
 
         <!-- Sport Tabs (Padel, Tennis, Badminton only) -->
