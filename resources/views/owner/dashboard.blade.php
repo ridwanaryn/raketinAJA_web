@@ -191,15 +191,7 @@
                     @endforelse
                 </div>
             </div>
-            
-            <!-- Ad Card -->
-            <div class="bg-primary p-6 rounded-lg shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[180px] kinetic-tilt">
-                <div class="absolute top-0 right-0 p-4 opacity-20">
-                    <span class="material-symbols-outlined text-6xl" style="font-variation-settings: 'FILL' 1;">bolt</span>
-                </div>
-                <p class="font-headline font-black text-on-primary text-xl leading-tight">Boost your bookings by 20% with Premium Listing.</p>
-                <button class="bg-surface-container-lowest text-primary px-6 py-2 rounded-full font-label font-bold text-xs uppercase w-max">Upgrade Now</button>
-            </div>
+
         </div>
     </div>
 
