@@ -67,31 +67,31 @@
                     <!-- Full Name -->
                     <div class="flex flex-col space-y-1">
                         <label class="text-[10px] font-headline font-bold uppercase tracking-widest text-secondary px-4" for="name">Full Name</label>
-                        <input class="w-full px-5 py-3 rounded-xl bg-surface-variant border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-on-surface-variant/40" id="name" name="name" value="{{ old('name') }}" placeholder="Alex Rivera" type="text" required/>
+                        <input class="w-full px-5 py-3 rounded-xl bg-white border-none focus:ring-2 focus:ring-primary focus:bg-white transition-all placeholder:text-on-surface-variant/40 text-on-surface" id="name" name="name" value="{{ old('name') }}" placeholder="John Doe" type="text" required/>
                     </div>
                 </div>
 
                 <!-- Email -->
                 <div class="flex flex-col space-y-1">
                     <label class="text-[10px] font-headline font-bold uppercase tracking-widest text-secondary px-4" for="email">Email Address</label>
-                    <input class="w-full px-5 py-3 rounded-xl bg-surface-variant border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-on-surface-variant/40" id="email" name="email" value="{{ old('email') }}" placeholder="alex@raketinAJA.com" type="email" required/>
+                    <input class="w-full px-5 py-3 rounded-xl bg-white border-none focus:ring-2 focus:ring-primary focus:bg-white transition-all placeholder:text-on-surface-variant/40 text-on-surface" id="email" name="email" value="{{ old('email') }}" placeholder="john@gmail.com" type="email" required/>
                 </div>
 
                 <!-- Phone -->
                 <div class="flex flex-col space-y-1">
                     <label class="text-[10px] font-headline font-bold uppercase tracking-widest text-secondary px-4" for="phone">Phone Number</label>
-                    <input class="w-full px-5 py-3 rounded-xl bg-surface-variant border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-on-surface-variant/40" id="phone" name="phone" value="{{ old('phone') }}" placeholder="+1 (555) 000-0000" type="tel" required/>
+                    <input class="w-full px-5 py-3 rounded-xl bg-white border-none focus:ring-2 focus:ring-primary focus:bg-white transition-all placeholder:text-on-surface-variant/40 text-on-surface" id="phone" name="phone" value="{{ old('phone') }}" placeholder="+62 123456" type="tel" required/>
                 </div>
 
                 <!-- Password and Confirm -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="flex flex-col space-y-1">
                         <label class="text-[10px] font-headline font-bold uppercase tracking-widest text-secondary px-4" for="password">Password</label>
-                        <input class="w-full px-5 py-3 rounded-xl bg-surface-variant border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-on-surface-variant/40" id="password" name="password" placeholder="••••••••" type="password" required/>
+                        <input class="w-full px-5 py-3 rounded-xl bg-white border-none focus:ring-2 focus:ring-primary focus:bg-white transition-all placeholder:text-on-surface-variant/40 text-on-surface" id="password" name="password" placeholder="••••••••" type="password" required/>
                     </div>
                     <div class="flex flex-col space-y-1">
                         <label class="text-[10px] font-headline font-bold uppercase tracking-widest text-secondary px-4" for="password_confirmation">Confirm</label>
-                        <input class="w-full px-5 py-3 rounded-xl bg-surface-variant border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-on-surface-variant/40" id="password_confirmation" name="password_confirmation" placeholder="••••••••" type="password" required/>
+                        <input class="w-full px-5 py-3 rounded-xl bg-white border-none focus:ring-2 focus:ring-primary focus:bg-white transition-all placeholder:text-on-surface-variant/40 text-on-surface" id="password_confirmation" name="password_confirmation" placeholder="••••••••" type="password" required/>
                     </div>
                 </div>
 
