@@ -39,7 +39,7 @@
                         <div class="absolute inset-y-0 left-5 flex items-center pointer-events-none text-outline">
                             <span class="material-symbols-outlined">alternate_email</span>
                         </div>
-                        <input class="w-full bg-surface-variant py-4 pl-14 pr-6 rounded-xl border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all duration-300 placeholder:text-outline-variant font-medium" id="email" name="email" value="{{ old('email') }}" placeholder="athlete@velocity.core" type="email" required autofocus/>
+                        <input class="w-full bg-white py-4 pl-14 pr-6 rounded-xl border-none focus:ring-2 focus:ring-primary focus:bg-white transition-all duration-300 placeholder:text-outline-variant font-medium text-on-surface" id="email" name="email" value="{{ old('email') }}" placeholder="athlete@velocity.core" type="email" required autofocus/>
                     </div>
                 </div>
 
@@ -53,7 +53,7 @@
                         <div class="absolute inset-y-0 left-5 flex items-center pointer-events-none text-outline">
                             <span class="material-symbols-outlined">lock</span>
                         </div>
-                        <input class="w-full bg-surface-variant py-4 pl-14 pr-14 rounded-xl border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all duration-300 placeholder:text-outline-variant font-medium" id="password" name="password" placeholder="••••••••" type="password" required/>
+                        <input class="w-full bg-white py-4 pl-14 pr-14 rounded-xl border-none focus:ring-2 focus:ring-primary focus:bg-white transition-all duration-300 placeholder:text-outline-variant font-medium text-on-surface" id="password" name="password" placeholder="••••••••" type="password" required/>
                         <button class="absolute inset-y-0 right-5 flex items-center text-outline-variant hover:text-primary transition-colors" type="button" onclick="togglePasswordVisibility()">
                             <span class="material-symbols-outlined" id="password-visibility-icon">visibility</span>
                         </button>
@@ -64,7 +64,7 @@
                 <div class="flex items-center justify-between px-1">
                     <label class="flex items-center gap-3 cursor-pointer group">
                         <div class="relative flex items-center justify-center">
-                            <input class="peer appearance-none w-6 h-6 rounded-md bg-surface-variant checked:bg-secondary-container border-none transition-all cursor-pointer" type="checkbox" name="remember" id="remember"/>
+                            <input class="peer appearance-none w-6 h-6 rounded-md bg-white checked:bg-secondary-container border-none transition-all cursor-pointer" type="checkbox" name="remember" id="remember"/>
                             <span class="material-symbols-outlined absolute text-on-secondary-container opacity-0 peer-checked:opacity-100 text-sm transition-opacity" style="font-variation-settings: 'wght' 700;">check</span>
                         </div>
                         <span class="text-sm font-semibold text-on-surface-variant group-hover:text-on-surface transition-colors">Keep me signed in</span>
