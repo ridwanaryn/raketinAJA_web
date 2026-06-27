@@ -119,7 +119,7 @@ class OwnerDashboardController extends Controller
     public function createField()
     {
         if (!Auth::user()->isOwner()) {
-            return redirect()->route('fields.index');
+            return redirect()->route('fields.index')->with('error', 'Akses ditolak. Halaman ini hanya untuk owner.');
         }
         return view('owner.fields.create');
     }
@@ -127,7 +127,7 @@ class OwnerDashboardController extends Controller
     public function storeField(Request $request)
     {
         if (!Auth::user()->isOwner()) {
-            return redirect()->route('fields.index');
+            return redirect()->route('fields.index')->with('error', 'Akses ditolak. Halaman ini hanya untuk owner.');
         }
 
         $request->validate([

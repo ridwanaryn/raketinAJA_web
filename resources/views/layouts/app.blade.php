@@ -69,51 +69,101 @@
 
     <!-- Main Container -->
     <main class="flex-grow pt-24 min-h-screen">
-        <!-- Success/Error Banner Alerts -->
-        <div class="max-w-screen-2xl mx-auto px-6 mt-4">
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="fixed top-24 right-6 z-[100] flex flex-col gap-3 w-full max-w-md pointer-events-none" style="max-width: min(420px, calc(100vw - 3rem));">
             @if(session('success'))
-                <div class="mb-6 p-5 bg-secondary-container bg-opacity-20 rounded-lg flex items-center gap-4 border-l-8 border-secondary-container">
-                    <div class="bg-secondary p-2.5 rounded-full flex items-center justify-center text-white shadow-md">
-                        <span class="material-symbols-outlined font-bold">check_circle</span>
+                <div class="toast-notification pointer-events-auto flex items-start gap-4 bg-[#f0fdf4] border border-[#bbf7d0] rounded-2xl px-5 py-4 shadow-[0_20px_60px_rgba(0,128,0,0.15)] backdrop-blur-xl transform translate-x-[120%] opacity-0 transition-all duration-500 ease-out"
+                     data-type="success">
+                    <div class="bg-[#16a34a] p-2 rounded-xl flex items-center justify-center text-white shadow-md shrink-0 mt-0.5">
+                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
                     </div>
-                    <div>
-                        <h4 class="font-headline font-bold text-on-surface">Action Succeeded</h4>
-                        <p class="text-on-surface-variant text-sm font-medium">{{ session('success') }}</p>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-headline font-bold text-[#14532d] text-sm">Berhasil!</h4>
+                        <p class="text-[#166534] text-sm font-medium mt-0.5 leading-snug">{{ session('success') }}</p>
+                    </div>
+                    <button onclick="dismissToast(this.parentElement)" class="text-[#16a34a]/60 hover:text-[#16a34a] transition-colors shrink-0 mt-0.5">
+                        <span class="material-symbols-outlined text-lg">close</span>
+                    </button>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 rounded-b-2xl overflow-hidden">
+                        <div class="toast-progress h-full bg-[#16a34a]/30 rounded-b-2xl"></div>
                     </div>
                 </div>
             @endif
 
             @if(session('error'))
-                <div class="mb-6 p-5 bg-error-container bg-opacity-20 rounded-lg flex items-center gap-4 border-l-8 border-error-container">
-                    <div class="bg-error p-2.5 rounded-full flex items-center justify-center text-[#ffefec] shadow-md">
-                        <span class="material-symbols-outlined font-bold">warning</span>
+                <div class="toast-notification pointer-events-auto flex items-start gap-4 bg-[#fef2f2] border border-[#fecaca] rounded-2xl px-5 py-4 shadow-[0_20px_60px_rgba(220,38,38,0.15)] backdrop-blur-xl transform translate-x-[120%] opacity-0 transition-all duration-500 ease-out"
+                     data-type="error">
+                    <div class="bg-[#dc2626] p-2 rounded-xl flex items-center justify-center text-white shadow-md shrink-0 mt-0.5">
+                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">error</span>
                     </div>
-                    <div>
-                        <h4 class="font-headline font-bold text-error">Process Interrupted</h4>
-                        <p class="text-error-dim text-sm font-medium">{{ session('error') }}</p>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-headline font-bold text-[#7f1d1d] text-sm">Gagal!</h4>
+                        <p class="text-[#991b1b] text-sm font-medium mt-0.5 leading-snug">{{ session('error') }}</p>
+                    </div>
+                    <button onclick="dismissToast(this.parentElement)" class="text-[#dc2626]/60 hover:text-[#dc2626] transition-colors shrink-0 mt-0.5">
+                        <span class="material-symbols-outlined text-lg">close</span>
+                    </button>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 rounded-b-2xl overflow-hidden">
+                        <div class="toast-progress h-full bg-[#dc2626]/30 rounded-b-2xl"></div>
                     </div>
                 </div>
             @endif
 
             @if ($errors->any())
-                <div class="mb-6 p-5 bg-error-container bg-opacity-20 rounded-lg flex flex-col gap-2 border-l-8 border-error-container">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-error p-2.5 rounded-full flex items-center justify-center text-[#ffefec] shadow-md">
-                            <span class="material-symbols-outlined font-bold">error</span>
-                        </div>
-                        <div>
-                            <h4 class="font-headline font-bold text-error">Validation Failed</h4>
-                            <p class="text-error-dim text-sm font-medium">Please correct the fields below and submit again.</p>
-                        </div>
+                <div class="toast-notification pointer-events-auto flex items-start gap-4 bg-[#fef2f2] border border-[#fecaca] rounded-2xl px-5 py-4 shadow-[0_20px_60px_rgba(220,38,38,0.15)] backdrop-blur-xl transform translate-x-[120%] opacity-0 transition-all duration-500 ease-out"
+                     data-type="error" data-duration="8000">
+                    <div class="bg-[#dc2626] p-2 rounded-xl flex items-center justify-center text-white shadow-md shrink-0 mt-0.5">
+                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">warning</span>
                     </div>
-                    <ul class="list-disc list-inside text-sm text-error-dim pl-14 font-medium">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-headline font-bold text-[#7f1d1d] text-sm">Validasi Gagal</h4>
+                        <ul class="text-[#991b1b] text-sm font-medium mt-1 leading-snug list-disc list-inside space-y-0.5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <button onclick="dismissToast(this.parentElement)" class="text-[#dc2626]/60 hover:text-[#dc2626] transition-colors shrink-0 mt-0.5">
+                        <span class="material-symbols-outlined text-lg">close</span>
+                    </button>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 rounded-b-2xl overflow-hidden">
+                        <div class="toast-progress h-full bg-[#dc2626]/30 rounded-b-2xl"></div>
+                    </div>
                 </div>
             @endif
         </div>
+
+        <script>
+        function dismissToast(el) {
+            el.style.transform = 'translateX(120%)';
+            el.style.opacity = '0';
+            setTimeout(function() { el.remove(); }, 500);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var toasts = document.querySelectorAll('.toast-notification');
+            toasts.forEach(function(toast, index) {
+                // Stagger entrance animation
+                setTimeout(function() {
+                    toast.style.transform = 'translateX(0)';
+                    toast.style.opacity = '1';
+                }, 100 + (index * 150));
+
+                // Auto-dismiss with progress bar
+                var duration = parseInt(toast.getAttribute('data-duration')) || 5000;
+                var progress = toast.querySelector('.toast-progress');
+                if (progress) {
+                    progress.style.width = '100%';
+                    progress.style.transition = 'width ' + duration + 'ms linear';
+                    setTimeout(function() { progress.style.width = '0%'; }, 150 + (index * 150));
+                }
+
+                setTimeout(function() {
+                    dismissToast(toast);
+                }, duration + 100 + (index * 150));
+            });
+        });
+        </script>
 
         @yield('content')
     </main>
