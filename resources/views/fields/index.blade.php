@@ -60,7 +60,7 @@
     </section>
 
     <!-- Main Grid -->
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+    <section id="fields-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
         @forelse($fields as $field)
             <!-- Field Card -->
             <div class="group bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_20px_40px_rgba(13,54,28,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
@@ -120,4 +120,69 @@
 
     </section>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+(function() {
+    const searchInput = document.querySelector('input[name="q"]');
+    const searchForm = searchInput ? searchInput.closest('form') : null;
+    const grid = document.getElementById('fields-grid');
+    let debounceTimer = null;
+    let abortController = null;
+
+    if (searchInput && searchForm && grid) {
+        // Prevent default form submit on Enter — use AJAX instead
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            performSearch();
+        });
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(performSearch, 300);
+        });
+    }
+
+    function performSearch() {
+        // Abort any in-flight request
+        if (abortController) abortController.abort();
+        abortController = new AbortController();
+
+        // Build URL from form data
+        const formData = new FormData(searchForm);
+        const params = new URLSearchParams(formData).toString();
+        const url = searchForm.action + '?' + params;
+
+        // Fade grid while loading
+        grid.style.opacity = '0.4';
+        grid.style.transition = 'opacity 0.2s';
+
+        // Update browser URL without reload
+        history.replaceState(null, '', url);
+
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            signal: abortController.signal
+        })
+        .then(function(res) { return res.text(); })
+        .then(function(html) {
+            // Parse the returned HTML and extract the grid content
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newGrid = doc.getElementById('fields-grid');
+            if (newGrid) {
+                grid.innerHTML = newGrid.innerHTML;
+            }
+            grid.style.opacity = '1';
+        })
+        .catch(function(err) {
+            if (err.name !== 'AbortError') {
+                console.error('Search error:', err);
+                grid.style.opacity = '1';
+            }
+        });
+    }
+})();
+</script>
 @endsection
