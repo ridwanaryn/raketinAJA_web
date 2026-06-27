@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
 
     // Owner routes
     Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
+    Route::get('/owner/calendar-bookings', [OwnerDashboardController::class, 'calendarBookings'])->name('owner.calendar.bookings');
     Route::get('/owner/fields/create', [OwnerDashboardController::class, 'createField'])->name('owner.fields.create');
     Route::post('/owner/fields', [OwnerDashboardController::class, 'storeField'])->name('owner.fields.store');
     Route::get('/owner/fields/{field}/edit', [OwnerDashboardController::class, 'editField'])->name('owner.fields.edit');

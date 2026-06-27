@@ -74,6 +74,48 @@ class OwnerDashboardController extends Controller
         ));
     }
 
+    /**
+     * API: Return booking counts per date for the calendar.
+     */
+    public function calendarBookings(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user->isOwner()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $year = (int) $request->input('year', Carbon::now()->year);
+        $month = (int) $request->input('month', Carbon::now()->month);
+        $fieldId = $request->input('field_id');
+
+        $myFieldIds = Field::where('owner_id', $user->id)->pluck('id')->toArray();
+
+        // If field_id is given, ensure it belongs to this owner
+        if ($fieldId && !in_array((int) $fieldId, $myFieldIds)) {
+            return response()->json(['error' => 'Field not found'], 404);
+        }
+
+        $targetFieldIds = $fieldId ? [(int) $fieldId] : $myFieldIds;
+
+        $bookings = Booking::whereIn('field_id', $targetFieldIds)
+            ->where('status', 'confirmed')
+            ->whereMonth('booking_date', $month)
+            ->whereYear('booking_date', $year)
+            ->selectRaw('booking_date, COUNT(*) as booking_count')
+            ->groupBy('booking_date')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [Carbon::parse($item->booking_date)->format('Y-m-d') => $item->booking_count];
+            });
+
+        return response()->json([
+            'year' => $year,
+            'month' => $month,
+            'bookings' => $bookings,
+        ]);
+    }
+
     public function createField()
     {
         if (!Auth::user()->isOwner()) {
