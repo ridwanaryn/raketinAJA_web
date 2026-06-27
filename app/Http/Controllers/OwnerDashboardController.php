@@ -22,43 +22,32 @@ class OwnerDashboardController extends Controller
         $myFields = Field::where('owner_id', $user->id)->get();
         $myFieldIds = $myFields->pluck('id')->toArray();
 
-        // 1. Calculate Total Revenue MTD (Month to Date)
-        $revenueMTD = Booking::whereIn('field_id', $myFieldIds)
+        // Calculate Daily Revenue and Booking counts over the last 30 days for Line Chart
+        $chartDataRaw = Booking::whereIn('field_id', $myFieldIds)
             ->where('status', 'confirmed')
-            ->whereMonth('booking_date', Carbon::now()->month)
-            ->whereYear('booking_date', Carbon::now()->year)
-            ->sum('total_price');
+            ->where('booking_date', '>=', Carbon::now()->subDays(30))
+            ->selectRaw('booking_date, SUM(total_price) as daily_revenue, COUNT(*) as daily_bookings')
+            ->groupBy('booking_date')
+            ->orderBy('booking_date', 'asc')
+            ->get()
+            ->keyBy(fn($item) => Carbon::parse($item->booking_date)->format('Y-m-d'));
 
-        // 2. Active Bookings count (from today onwards)
-        $activeBookingsCount = Booking::whereIn('field_id', $myFieldIds)
-            ->where('status', 'confirmed')
-            ->whereDate('booking_date', '>=', Carbon::today())
-            ->count();
+        $chartLabels = [];
+        $chartRevenue = [];
+        $chartBookings = [];
 
-        // 3. Peak Utilization calculation
-        $peakSlot = Booking::whereIn('field_id', $myFieldIds)
-            ->where('status', 'confirmed')
-            ->selectRaw('start_time, count(*) as cnt')
-            ->groupBy('start_time')
-            ->orderByDesc('cnt')
-            ->first();
-        
-        $peakTime = $peakSlot ? Carbon::parse($peakSlot->start_time)->format('H:i') : '19:00';
-
-        // 4. Capacity Percentage (booked slots today / total possible slots today)
-        $totalFields = count($myFields);
-        $totalSlotsPossibleToday = $totalFields * 6; // 6 slots per day
-        $todayBookings = Booking::whereIn('field_id', $myFieldIds)
-            ->where('status', 'confirmed')
-            ->whereDate('booking_date', Carbon::today())
-            ->count();
-
-        $capacityPercent = $totalSlotsPossibleToday > 0 
-            ? round(($todayBookings / $totalSlotsPossibleToday) * 100) 
-            : 0;
+        for ($i = 29; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
+            $label = Carbon::parse($date)->format('d M');
+            $chartLabels[] = $label;
             
-        if ($capacityPercent <= 0) {
-            $capacityPercent = 88; // fallback realistic seeder default
+            if (isset($chartDataRaw[$date])) {
+                $chartRevenue[] = (float) $chartDataRaw[$date]->daily_revenue;
+                $chartBookings[] = (int) $chartDataRaw[$date]->daily_bookings;
+            } else {
+                $chartRevenue[] = 0.0;
+                $chartBookings[] = 0;
+            }
         }
 
         // 5. Recent Activity bookings list
@@ -69,8 +58,8 @@ class OwnerDashboardController extends Controller
             ->get();
 
         return view('owner.dashboard', compact(
-            'myFields', 'revenueMTD', 'activeBookingsCount', 
-            'peakTime', 'capacityPercent', 'recentBookings'
+            'myFields', 'chartLabels', 'chartRevenue', 
+            'chartBookings', 'recentBookings'
         ));
     }
 

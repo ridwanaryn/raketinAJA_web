@@ -16,55 +16,27 @@
         </a>
     </div>
 
-    <!-- Bento Grid Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        <!-- Revenue Stat -->
-        <div class="md:col-span-2 bg-surface-container-lowest p-8 rounded-lg shadow-sm relative overflow-hidden group">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-primary-container/20 rounded-bl-full -mr-10 -mt-10"></div>
-            <h3 class="font-label font-bold text-primary tracking-widest text-xs uppercase mb-4">Total Revenue (MTD)</h3>
-            <div class="flex items-baseline gap-2 mb-6">
-                <span class="font-headline font-black text-6xl tracking-tighter">${{ number_format($revenueMTD, 0) }}</span>
-                <span class="font-body font-bold text-secondary text-sm flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs">trending_up</span> +12.4%
-                </span>
-            </div>
-            <div class="h-16 flex items-end gap-1">
-                <div class="flex-1 bg-primary/10 rounded-t-full h-[40%]"></div>
-                <div class="flex-1 bg-primary/10 rounded-t-full h-[60%]"></div>
-                <div class="flex-1 bg-primary/10 rounded-t-full h-[55%]"></div>
-                <div class="flex-1 bg-primary/20 rounded-t-full h-[75%]"></div>
-                <div class="flex-1 bg-primary/20 rounded-t-full h-[90%]"></div>
-                <div class="flex-1 bg-primary rounded-t-full h-[100%]"></div>
-                <div class="flex-1 bg-primary/30 rounded-t-full h-[70%]"></div>
-            </div>
-        </div>
-        
-        <!-- Active Bookings Stat -->
-        <div class="bg-surface-container-lowest p-8 rounded-lg shadow-sm flex flex-col justify-between">
+    <!-- Analysis Line Chart -->
+    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-surface-variant/20 mb-12">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div>
-                <h3 class="font-label font-bold text-on-surface-variant tracking-widest text-xs uppercase mb-1">Active Bookings</h3>
-                <span class="font-headline font-black text-5xl tracking-tighter text-on-surface">{{ $activeBookingsCount }}</span>
+                <h3 class="font-headline font-extrabold text-2xl tracking-tight text-on-surface">Analisis Performa Bisnis</h3>
+                <p class="font-body text-sm font-medium text-on-surface-variant">Pendapatan dan jumlah booking selama 30 hari terakhir.</p>
             </div>
-            <div class="bg-secondary-container/30 rounded-xl p-4 mt-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="font-body text-xs font-bold text-on-secondary-container">Capacity</span>
-                    <span class="font-body text-xs font-bold text-on-secondary-container">{{ $capacityPercent }}%</span>
+            <!-- Legend Indicators -->
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#0052d0]"></span>
+                    <span class="font-body text-xs font-bold text-on-surface-variant">Total Pendapatan ($)</span>
                 </div>
-                <div class="w-full bg-surface-variant h-2 rounded-full overflow-hidden">
-                    <div class="bg-secondary h-full" style="width: {{ $capacityPercent }}%"></div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#00fc40] shadow-[0_0_8px_rgba(0,252,64,0.6)]"></span>
+                    <span class="font-body text-xs font-bold text-on-surface-variant">Jumlah Booking</span>
                 </div>
             </div>
         </div>
-
-        <!-- Performance Stat -->
-        <div class="bg-secondary-fixed p-8 rounded-lg shadow-sm flex flex-col justify-between">
-            <div>
-                <h3 class="font-label font-bold text-on-secondary-fixed tracking-widest text-xs uppercase mb-1">Peak Utilization</h3>
-                <span class="font-headline font-black text-5xl tracking-tighter text-on-secondary-fixed">{{ $peakTime }}</span>
-            </div>
-            <p class="font-body text-sm font-bold text-on-secondary-fixed-variant mt-4">
-                Prime hours are currently 92% booked for the next 14 days.
-            </p>
+        <div class="relative w-full h-[320px]">
+            <canvas id="businessAnalysisChart"></canvas>
         </div>
     </div>
 
@@ -223,8 +195,111 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function() {
+    // --- Chart.js ---
+    const chartCtx = document.getElementById('businessAnalysisChart');
+    if (chartCtx) {
+        new Chart(chartCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {!! json_encode($chartLabels) !!},
+                datasets: [
+                    {
+                        label: 'Total Revenue ($)',
+                        data: {!! json_encode($chartRevenue) !!},
+                        borderColor: '#0052d0',
+                        backgroundColor: 'rgba(0, 82, 208, 0.05)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Jumlah Booking',
+                        data: {!! json_encode($chartBookings) !!},
+                        borderColor: '#00fc40',
+                        backgroundColor: 'rgba(0, 252, 64, 0.05)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        padding: 12,
+                        cornerRadius: 8,
+                        backgroundColor: '#0d361c',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Plus Jakarta Sans',
+                                size: 10
+                            },
+                            color: '#64748b'
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Plus Jakarta Sans',
+                                size: 10
+                            },
+                            color: '#64748b',
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Plus Jakarta Sans',
+                                size: 10
+                            },
+                            color: '#64748b',
+                            stepSize: 1,
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     // --- State ---
     const now = new Date();
     let currentYear = now.getFullYear();
