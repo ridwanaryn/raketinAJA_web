@@ -66,8 +66,8 @@
             <div class="group bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_20px_40px_rgba(13,54,28,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
                 <div>
                     <div class="relative h-64 overflow-hidden bg-surface-variant">
-                        @if($field->image_url)
-                            <img alt="{{ $field->name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="{{ $field->image_url }}"/>
+                        @if($field->first_image_url)
+                            <img alt="{{ $field->name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="{{ $field->first_image_url }}"/>
                         @else
                             <div class="w-full h-full flex items-center justify-center bg-[#bff5c8] text-primary">
                                 <span class="material-symbols-outlined text-6xl">sports_tennis</span>

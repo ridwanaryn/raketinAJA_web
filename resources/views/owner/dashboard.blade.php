@@ -113,8 +113,8 @@
                         <div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between gap-4 border border-outline-variant/10">
                             <div class="flex items-center gap-4 min-w-0">
                                 <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-variant">
-                                    @if($field->image_url)
-                                        <img alt="{{ $field->name }}" class="w-full h-full object-cover" src="{{ $field->image_url }}"/>
+                                    @if($field->first_image_url)
+                                        <img alt="{{ $field->name }}" class="w-full h-full object-cover" src="{{ $field->first_image_url }}"/>
                                     @else
                                         <div class="w-full h-full flex items-center justify-center bg-[#bff5c8] text-primary">
                                             <span class="material-symbols-outlined text-xl">sports_tennis</span>

@@ -26,8 +26,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Field Image Card -->
                 <div class="md:col-span-2 relative group overflow-hidden rounded-lg kinetic-tilt shadow-lg aspect-video">
-                    @if($field->image_url)
-                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="{{ $field->name }}" src="{{ $field->image_url }}"/>
+                    @if($field->first_image_url)
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="{{ $field->name }}" src="{{ $field->first_image_url }}"/>
                     @else
                         <div class="w-full h-full flex items-center justify-center bg-[#bff5c8] text-primary">
                             <span class="material-symbols-outlined text-7xl">sports_tennis</span>

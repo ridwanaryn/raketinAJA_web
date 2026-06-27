@@ -128,7 +128,8 @@ class OwnerDashboardController extends Controller
             'features' => 'nullable|string', // comma separated values
             'description' => 'nullable|string',
             'location' => 'required|string|max:255',
-            'image_url' => 'nullable|url',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
             'status' => 'required|in:active,maintenance,cleaning',
         ]);
 
@@ -136,6 +137,20 @@ class OwnerDashboardController extends Controller
         $featuresArray = [];
         if ($request->filled('features')) {
             $featuresArray = array_map('trim', explode(',', $request->features));
+        }
+
+        // Store multiple images
+        $imageUrls = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('fields', 'public');
+                $imageUrls[] = '/storage/' . $path;
+            }
+        }
+
+        // Default fallback if no images uploaded
+        if (empty($imageUrls)) {
+            $imageUrls[] = 'https://images.unsplash.com/photo-1545809074-59472b3f5eca';
         }
 
         Auth::user()->fields()->create([
@@ -147,7 +162,7 @@ class OwnerDashboardController extends Controller
             'features' => $featuresArray,
             'description' => $request->description,
             'location' => $request->location,
-            'image_url' => $request->image_url ?: 'https://images.unsplash.com/photo-1545809074-59472b3f5eca', // default tennis/padel image
+            'image_url' => $imageUrls, // Will be cast to JSON string by mutator
             'status' => $request->status,
         ]);
 
@@ -181,7 +196,9 @@ class OwnerDashboardController extends Controller
             'features' => 'nullable|string', // comma separated values
             'description' => 'nullable|string',
             'location' => 'required|string|max:255',
-            'image_url' => 'nullable|url',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
+            'deleted_images' => 'nullable|array',
             'status' => 'required|in:active,maintenance,cleaning',
         ]);
 
@@ -189,6 +206,37 @@ class OwnerDashboardController extends Controller
         $featuresArray = [];
         if ($request->filled('features')) {
             $featuresArray = array_map('trim', explode(',', $request->features));
+        }
+
+        // Get current images list
+        $currentImages = is_array($field->image_url) ? $field->image_url : [$field->image_url];
+
+        // Process deleted images
+        $deletedImages = $request->input('deleted_images', []);
+        foreach ($deletedImages as $deletedUrl) {
+            if (($key = array_search($deletedUrl, $currentImages)) !== false) {
+                unset($currentImages[$key]);
+            }
+            // Delete file from local storage if applicable
+            if (strpos($deletedUrl, '/storage/') === 0) {
+                $filePath = str_replace('/storage/', '', $deletedUrl);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($filePath);
+            }
+        }
+
+        // Process new uploads
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('fields', 'public');
+                $currentImages[] = '/storage/' . $path;
+            }
+        }
+
+        $currentImages = array_values($currentImages);
+
+        // Fallback default image if all images are deleted
+        if (empty($currentImages)) {
+            $currentImages[] = 'https://images.unsplash.com/photo-1545809074-59472b3f5eca';
         }
 
         $field->update([
@@ -200,7 +248,7 @@ class OwnerDashboardController extends Controller
             'features' => $featuresArray,
             'description' => $request->description,
             'location' => $request->location,
-            'image_url' => $request->image_url,
+            'image_url' => $currentImages, // Will be cast to JSON string by mutator
             'status' => $request->status,
         ]);
 
@@ -213,6 +261,15 @@ class OwnerDashboardController extends Controller
         // Security check
         if (Auth::id() !== $field->owner_id) {
             return redirect()->route('owner.dashboard')->with('error', 'Unauthorized access.');
+        }
+
+        // Delete associated files from storage
+        $images = is_array($field->image_url) ? $field->image_url : [$field->image_url];
+        foreach ($images as $imageUrl) {
+            if (strpos($imageUrl, '/storage/') === 0) {
+                $filePath = str_replace('/storage/', '', $imageUrl);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($filePath);
+            }
         }
 
         $field->delete();

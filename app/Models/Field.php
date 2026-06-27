@@ -26,6 +26,31 @@ class Field extends Model
         ];
     }
 
+    public function getImageUrlAttribute($value)
+    {
+        if (empty($value)) {
+            return [];
+        }
+        
+        $decoded = json_decode($value, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return $decoded;
+        }
+        
+        return [$value];
+    }
+
+    public function setImageUrlAttribute($value)
+    {
+        $this->attributes['image_url'] = is_array($value) ? json_encode($value) : $value;
+    }
+
+    public function getFirstImageUrlAttribute()
+    {
+        $images = $this->image_url;
+        return is_array($images) ? ($images[0] ?? 'https://images.unsplash.com/photo-1545809074-59472b3f5eca') : $images;
+    }
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');

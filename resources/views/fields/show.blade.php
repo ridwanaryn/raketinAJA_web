@@ -4,28 +4,35 @@
 
 @section('content')
 <div class="max-w-screen-2xl mx-auto px-6 py-8">
-    <!-- Hero Gallery Section -->
-    <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-        <div class="md:col-span-3 rounded-lg overflow-hidden kinetic-tilt shadow-lg aspect-video md:aspect-auto md:h-[500px]">
-            @if($field->image_url)
-                <img class="w-full h-full object-cover" alt="{{ $field->name }}" src="{{ $field->image_url }}"/>
+    <!-- Horizontal Scrollable Gallery (Carousel-like) -->
+    <section class="mb-12 relative">
+        <div class="flex gap-6 overflow-x-auto py-2 px-1 snap-x snap-mandatory scroll-smooth no-scrollbar" id="gallery-scroller" style="scrollbar-width: none; -ms-overflow-style: none;">
+            @if(!empty($field->image_url) && count($field->image_url) > 0)
+                @foreach($field->image_url as $image)
+                    <div class="flex-shrink-0 w-[85%] sm:w-[60%] md:w-[45%] lg:w-[35%] aspect-[16/10] rounded-2xl overflow-hidden shadow-lg border border-surface-variant/20 snap-start relative group">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="{{ $field->name }}" src="{{ $image }}"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                @endforeach
             @else
-                <div class="w-full h-full flex items-center justify-center bg-[#bff5c8] text-primary">
-                    <span class="material-symbols-outlined text-9xl">sports_tennis</span>
+                <div class="flex-shrink-0 w-full h-[320px] rounded-2xl bg-[#bff5c8] text-primary flex flex-col items-center justify-center gap-3 shadow-md">
+                    <span class="material-symbols-outlined text-6xl">sports_tennis</span>
+                    <p class="font-headline font-bold">No images uploaded for this court.</p>
                 </div>
             @endif
         </div>
-        <div class="hidden md:flex flex-col gap-4">
-            <div class="flex-1 rounded-lg overflow-hidden shadow-md bg-surface-container">
-                <img class="w-full h-full object-cover opacity-85 hover:opacity-100 transition-opacity" alt="Lines detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByzy3-iT6TwiT6zWiD4geYHgzIIoNzo59-WFU8_fY-Vp_fy42e7llAvUZo5UPeCKfzeLB2QVbwO5sb0H_NzVaFNU-hx637P23VXbUu7so3tLeDa8RaJtPZwWhoAvlzaDgFwxb4VvMlg6s0WYvTmzDP09fDa_rtTPPhrn1vgtZYfj-e8RNjI2a5i7RPS8K_fpIa-rfE-GxNON_QkAGdzdopvUK4rt54aoN-HA3SalGxSQ6jR6l1-C_EwL2qLnP1MTAebRSv0X25Ew"/>
+
+        <!-- Navigation Buttons (Desktop only) -->
+        @if(!empty($field->image_url) && count($field->image_url) > 1)
+            <div class="hidden md:flex justify-between items-center absolute inset-y-0 left-0 right-0 pointer-events-none px-4">
+                <button onclick="scrollGallery(-1)" class="w-12 h-12 rounded-full bg-white/90 hover:bg-white text-on-surface shadow-lg pointer-events-auto flex items-center justify-center active:scale-95 transition-all">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button onclick="scrollGallery(1)" class="w-12 h-12 rounded-full bg-white/90 hover:bg-white text-on-surface shadow-lg pointer-events-auto flex items-center justify-center active:scale-95 transition-all">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
             </div>
-            <div class="flex-1 rounded-lg overflow-hidden shadow-md relative bg-surface-container">
-                <img class="w-full h-full object-cover" alt="Ball detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlAkVsPehpIvJ4a8PJyWaXcFoU6CaPCplfjqWiHsGukURtnrdQuf2ioctqzdIAiTWBP5WKQYb8S-Yn7eOMOoxHn755uw1Gx8Nz0R7rTqAwtbJexm425exLsy3LzI32Mnhsq7wD7na-Fg1cm6bPFyqcEntu6YJZGtfxL2IkpV0-aR7gVNfMBfpRKZQhEmUNQT-G91_FO73L-y_HseSHEXBU0F8OFjxAfeVCqbKymftV7C0n9TudhoNcTdF4hKlRJby0gjTyqXNVSw"/>
-                <div class="absolute inset-0 bg-primary/40 flex items-center justify-center backdrop-blur-sm cursor-pointer group">
-                    <span class="text-white font-headline font-bold text-xl group-hover:scale-110 transition-transform">+12 Photos</span>
-                </div>
-            </div>
-        </div>
+        @endif
     </section>
 
     <!-- Content Bento Grid -->
@@ -188,4 +195,22 @@
         </aside>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+function scrollGallery(direction) {
+    const scroller = document.getElementById('gallery-scroller');
+    if (!scroller) return;
+    
+    const card = scroller.querySelector('div');
+    if (!card) return;
+    
+    const scrollAmount = (card.offsetWidth + 24) * direction;
+    scroller.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+    });
+}
+</script>
 @endsection
