@@ -132,11 +132,11 @@
             </div>
         </div>
 
-        <!-- Field Health list -->
+        <!-- Lapangan Saya list -->
         <div class="flex flex-col gap-6">
             <div class="bg-surface-container-high p-6 rounded-lg shadow-sm">
-                <h3 class="font-headline font-extrabold text-xl text-on-surface mb-6">Field Health</h3>
-                <div class="space-y-4">
+                <h3 class="font-headline font-extrabold text-xl text-on-surface mb-6">Lapangan Saya</h3>
+                <div class="space-y-4 max-h-[420px] overflow-y-auto pr-1" style="scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.15) transparent;">
                     @forelse($myFields as $field)
                         <div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between gap-4 border border-outline-variant/10">
                             <div class="flex items-center gap-4 min-w-0">
@@ -151,36 +151,21 @@
                                 </div>
                                 <div class="min-w-0">
                                     <p class="font-body font-bold text-sm text-on-surface truncate">{{ $field->name }}</p>
-                                    @if($field->status === 'active')
-                                        <span class="text-[10px] font-label font-bold uppercase text-secondary">Maintenance OK</span>
-                                    @elseif($field->status === 'cleaning')
-                                        <span class="text-[10px] font-label font-bold uppercase text-tertiary">Cleaning Pending</span>
-                                    @else
-                                        <span class="text-[10px] font-label font-bold uppercase text-red-600">Maintenance Needed</span>
-                                    @endif
+                                    <span class="text-[10px] font-label font-bold uppercase text-on-surface-variant/60">{{ $field->sport_type }} • {{ $field->is_indoor ? 'Indoor' : 'Outdoor' }}</span>
                                 </div>
                             </div>
                             
-                            <!-- Actions (Edit, Delete, and Status Icon) -->
-                            <div class="flex items-center gap-3 shrink-0">
-                                @if($field->status === 'active')
-                                    <span class="material-symbols-outlined text-secondary" title="Active">check_circle</span>
-                                @else
-                                    <span class="material-symbols-outlined text-tertiary" title="Warning">warning</span>
-                                @endif
-                                
-                                <div class="flex gap-1.5">
-                                    <a href="{{ route('owner.fields.edit', $field->id) }}" class="p-1 text-[#0052d0] hover:bg-[#bff5c8] rounded-full transition-colors" title="Edit">
-                                        <span class="material-symbols-outlined text-lg">edit</span>
-                                    </a>
-                                    <form action="{{ route('owner.fields.destroy', $field->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this field?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="p-1 text-red-600 hover:bg-red-100 rounded-full transition-colors" title="Delete">
-                                            <span class="material-symbols-outlined text-lg">delete</span>
-                                        </button>
-                                    </form>
-                                </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <a href="{{ route('owner.fields.edit', $field->id) }}" class="p-1 text-[#0052d0] hover:bg-[#bff5c8] rounded-full transition-colors" title="Edit">
+                                    <span class="material-symbols-outlined text-lg">edit</span>
+                                </a>
+                                <form action="{{ route('owner.fields.destroy', $field->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this field?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-1 text-red-600 hover:bg-red-100 rounded-full transition-colors" title="Delete">
+                                        <span class="material-symbols-outlined text-lg">delete</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     @empty
