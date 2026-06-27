@@ -22,45 +22,67 @@ class OwnerDashboardController extends Controller
         $myFields = Field::where('owner_id', $user->id)->get();
         $myFieldIds = $myFields->pluck('id')->toArray();
 
-        // Calculate Daily Revenue and Booking counts over the last 30 days for Line Chart
-        $chartDataRaw = Booking::whereIn('field_id', $myFieldIds)
-            ->where('status', 'confirmed')
-            ->where('booking_date', '>=', Carbon::now()->subDays(30))
-            ->selectRaw('booking_date, SUM(total_price) as daily_revenue, COUNT(*) as daily_bookings')
-            ->groupBy('booking_date')
-            ->orderBy('booking_date', 'asc')
-            ->get()
-            ->keyBy(fn($item) => Carbon::parse($item->booking_date)->format('Y-m-d'));
-
-        $chartLabels = [];
-        $chartRevenue = [];
-        $chartBookings = [];
-
-        for ($i = 29; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $label = Carbon::parse($date)->format('d M');
-            $chartLabels[] = $label;
-            
-            if (isset($chartDataRaw[$date])) {
-                $chartRevenue[] = (float) $chartDataRaw[$date]->daily_revenue;
-                $chartBookings[] = (int) $chartDataRaw[$date]->daily_bookings;
-            } else {
-                $chartRevenue[] = 0.0;
-                $chartBookings[] = 0;
-            }
-        }
-
-        // 5. Recent Activity bookings list
+        // Recent Activity bookings list
         $recentBookings = Booking::whereIn('field_id', $myFieldIds)
             ->with(['field', 'user'])
             ->latest()
             ->limit(5)
             ->get();
 
-        return view('owner.dashboard', compact(
-            'myFields', 'chartLabels', 'chartRevenue', 
-            'chartBookings', 'recentBookings'
-        ));
+        return view('owner.dashboard', compact('myFields', 'recentBookings'));
+    }
+
+    /**
+     * API: Return daily revenue and bookings data for chart.
+     */
+    public function chartData(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user->isOwner()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $year = (int) $request->input('year', Carbon::now()->year);
+        $month = (int) $request->input('month', Carbon::now()->month);
+
+        $myFieldIds = Field::where('owner_id', $user->id)->pluck('id')->toArray();
+
+        $bookingsRaw = Booking::whereIn('field_id', $myFieldIds)
+            ->where('status', 'confirmed')
+            ->whereMonth('booking_date', $month)
+            ->whereYear('booking_date', $year)
+            ->selectRaw('booking_date, SUM(total_price) as daily_revenue, COUNT(*) as daily_bookings')
+            ->groupBy('booking_date')
+            ->get()
+            ->keyBy(fn($item) => Carbon::parse($item->booking_date)->format('Y-m-d'));
+
+        $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
+        
+        $labels = [];
+        $revenue = [];
+        $bookings = [];
+
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $date = sprintf('%04d-%02d-%02d', $year, $month, $d);
+            $labels[] = sprintf('%02d %s', $d, Carbon::createFromDate($year, $month, 1)->format('M'));
+            
+            if (isset($bookingsRaw[$date])) {
+                $revenue[] = (float) $bookingsRaw[$date]->daily_revenue;
+                $bookings[] = (int) $bookingsRaw[$date]->daily_bookings;
+            } else {
+                $revenue[] = 0.0;
+                $bookings[] = 0;
+            }
+        }
+
+        return response()->json([
+            'year' => $year,
+            'month' => $month,
+            'labels' => $labels,
+            'revenue' => $revenue,
+            'bookings' => $bookings,
+        ]);
     }
 
     /**

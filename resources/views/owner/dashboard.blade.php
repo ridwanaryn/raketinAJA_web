@@ -18,13 +18,19 @@
 
     <!-- Analysis Line Chart -->
     <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-surface-variant/20 mb-12">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <div>
-                <h3 class="font-headline font-extrabold text-2xl tracking-tight text-on-surface">Analisis Performa Bisnis</h3>
-                <p class="font-body text-sm font-medium text-on-surface-variant">Pendapatan dan jumlah booking selama 30 hari terakhir.</p>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-6">
+            <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-4">
+                    <h3 id="chart-month-label" class="font-headline font-extrabold text-2xl tracking-tight text-on-surface">Analisis Performa Bisnis</h3>
+                    <div class="flex gap-2">
+                        <button id="btn-chart-prev" class="w-9 h-9 rounded-full border-2 border-surface-variant hover:bg-surface-variant/20 transition-all flex items-center justify-center active:scale-95"><span class="material-symbols-outlined text-sm text-on-surface">chevron_left</span></button>
+                        <button id="btn-chart-next" class="w-9 h-9 rounded-full border-2 border-surface-variant hover:bg-surface-variant/20 transition-all flex items-center justify-center active:scale-95"><span class="material-symbols-outlined text-sm text-on-surface">chevron_right</span></button>
+                    </div>
+                </div>
+                <p class="font-body text-sm font-medium text-on-surface-variant mt-1">Pendapatan dan jumlah booking berdasarkan interval bulan berjalan.</p>
             </div>
             <!-- Legend Indicators -->
-            <div class="flex items-center gap-6">
+            <div class="flex flex-wrap items-center gap-6">
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 rounded-full bg-[#0052d0]"></span>
                     <span class="font-body text-xs font-bold text-on-surface-variant">Total Pendapatan ($)</span>
@@ -35,7 +41,7 @@
                 </div>
             </div>
         </div>
-        <div class="relative w-full h-[320px]">
+        <div class="relative w-full h-[320px] transition-opacity duration-300" id="chart-container-div">
             <canvas id="businessAnalysisChart"></canvas>
         </div>
     </div>
@@ -198,17 +204,40 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function() {
+    // --- State ---
+    const now = new Date();
+    let currentYear = now.getFullYear();
+    let currentMonth = now.getMonth() + 1; // 1-indexed
+    let selectedFieldId = '';
+    let isLoading = false;
+
+    // --- Month names ---
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
     // --- Chart.js ---
     const chartCtx = document.getElementById('businessAnalysisChart');
+    const chartMonthLabel = document.getElementById('chart-month-label');
+    const btnChartPrev = document.getElementById('btn-chart-prev');
+    const btnChartNext = document.getElementById('btn-chart-next');
+    const chartContainer = document.getElementById('chart-container-div');
+    
+    let businessChart = null;
+    let chartYear = now.getFullYear();
+    let chartMonth = now.getMonth() + 1; // 1-indexed
+    let isChartLoading = false;
+
     if (chartCtx) {
-        new Chart(chartCtx.getContext('2d'), {
+        businessChart = new Chart(chartCtx.getContext('2d'), {
             type: 'line',
             data: {
-                labels: {!! json_encode($chartLabels) !!},
+                labels: [],
                 datasets: [
                     {
                         label: 'Total Revenue ($)',
-                        data: {!! json_encode($chartRevenue) !!},
+                        data: [],
                         borderColor: '#0052d0',
                         backgroundColor: 'rgba(0, 82, 208, 0.05)',
                         borderWidth: 3,
@@ -218,7 +247,7 @@
                     },
                     {
                         label: 'Jumlah Booking',
-                        data: {!! json_encode($chartBookings) !!},
+                        data: [],
                         borderColor: '#00fc40',
                         backgroundColor: 'rgba(0, 252, 64, 0.05)',
                         borderWidth: 3,
@@ -298,27 +327,73 @@
                 }
             }
         });
+
+        // Load chart data function
+        async function loadChartData() {
+            if (isChartLoading) return;
+            isChartLoading = true;
+            chartContainer.style.opacity = '0.4';
+
+            const url = new URL('/owner/chart-data', window.location.origin);
+            url.searchParams.set('year', chartYear);
+            url.searchParams.set('month', chartMonth);
+
+            try {
+                const res = await fetch(url.toString(), {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                });
+
+                if (!res.ok) throw new Error('Failed to fetch chart data');
+
+                const data = await res.json();
+                
+                // Update chart title
+                chartMonthLabel.textContent = 'Analisis Performa - ' + monthNames[chartMonth - 1] + ' ' + chartYear;
+
+                // Update chart datasets
+                businessChart.data.labels = data.labels || [];
+                businessChart.data.datasets[0].data = data.revenue || [];
+                businessChart.data.datasets[1].data = data.bookings || [];
+                businessChart.update();
+            } catch (err) {
+                console.error('Chart load error:', err);
+            } finally {
+                isChartLoading = false;
+                chartContainer.style.opacity = '1';
+            }
+        }
+
+        // Add event listeners for chart navigation
+        btnChartPrev.addEventListener('click', () => {
+            chartMonth--;
+            if (chartMonth < 1) {
+                chartMonth = 12;
+                chartYear--;
+            }
+            loadChartData();
+        });
+
+        btnChartNext.addEventListener('click', () => {
+            chartMonth++;
+            if (chartMonth > 12) {
+                chartMonth = 1;
+                chartYear++;
+            }
+            loadChartData();
+        });
+
+        // Initial chart load
+        loadChartData();
     }
-
-    // --- State ---
-    const now = new Date();
-    let currentYear = now.getFullYear();
-    let currentMonth = now.getMonth() + 1; // 1-indexed
-    let selectedFieldId = '';
-    let isLoading = false;
-
     // --- DOM refs ---
     const grid = document.getElementById('calendar-grid');
     const monthLabel = document.getElementById('calendar-month-label');
     const btnPrev = document.getElementById('btn-prev-month');
     const btnNext = document.getElementById('btn-next-month');
     const fieldFilter = document.getElementById('calendar-field-filter');
-
-    // --- Month names ---
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
 
     // --- Helpers ---
     function daysInMonth(year, month) {
